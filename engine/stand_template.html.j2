@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<style>
+  @font-face { font-family: 'Cairo'; src: url('{{ font_regular }}'); font-weight: 400; }
+  @font-face { font-family: 'Cairo'; src: url('{{ font_bold }}'); font-weight: 700; }
+  @font-face { font-family: 'Cairo'; src: url('{{ font_black }}'); font-weight: 900; }
+
+  @page { size: 148mm 210mm; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    position: relative;
+    width: 148mm; height: 210mm;
+    font-family: 'Cairo', sans-serif;
+    line-height: 1.25;
+    color: {{ theme.text_dark }};
+    background: {{ theme.cream }};
+    padding: 8mm 9mm;
+  }
+
+  .banner {
+    border-radius: 6mm; padding: 5mm 4mm;
+    background: linear-gradient(135deg, {{ theme.primary }}, {{ theme.primary_dark }});
+    color: #fff; text-align: center; margin: 0 0 3mm;
+  }
+  .banner .name { font-size: 26pt; font-weight: 900; margin: 0; }
+  .banner .tagline { font-size: 10.5pt; font-weight: 400; margin: 2mm 0 0; opacity: 0.92; }
+
+  .section-label {
+    font-size: 10.5pt; font-weight: 700; color: {{ theme.primary_dark }};
+    margin: 0 0 2.5mm; text-align: center;
+  }
+
+  .qr-block { text-align: center; margin: 0 0 3mm; }
+  .qr-block img { display: inline-block; width: 40mm; height: 40mm; border-radius: 3mm; }
+  .handle {
+    margin: 2mm 0 0; font-size: 9.5pt; font-weight: 700; direction: ltr; unicode-bidi: plaintext;
+    color: {{ theme.text_dark }}; text-align: center;
+  }
+
+  .divider { width: 70%; height: 1px; background: #e3d5c2; margin: 2mm auto 4mm; }
+
+  .social-row { text-align: center; margin-top: 3mm; }
+  .social-row .dot {
+    display: inline-block; width: 10mm; height: 10mm; border-radius: 50%;
+    margin: 0 1.5mm; vertical-align: middle;
+  }
+  .social-row .dot svg { width: 10mm; height: 10mm; display: block; }
+
+  footer {
+    margin-top: 3mm;
+    text-align: center; font-size: 8pt; color: #8a7f70;
+    border-top: 1px solid #e3d5c2; padding-top: 3mm;
+  }
+</style>
+</head>
+<body>
+  <div class="banner">
+    {% if logo_b64 %}
+    <img src="data:image/png;base64,{{ logo_b64 }}"
+         style="width:16mm;height:16mm;border-radius:50%;object-fit:cover;border:1mm solid rgba(255,255,255,0.5);margin-bottom:2mm;">
+    {% endif %}
+    <p class="name">{{ business.name_ar }}</p>
+    <p class="tagline">{{ business.tagline_ar }}</p>
+  </div>
+
+  <div class="qr-block">
+    <p class="section-label">ادفع بسهولة عبر InstaPay</p>
+    <img src="data:image/png;base64,{{ instapay_qr_b64 }}">
+    <p class="handle">{{ payment.instapay_handle }}</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="qr-block">
+    <p class="section-label">تابعنا وتواصل معنا</p>
+    <img src="data:image/png;base64,{{ linktree_qr_b64 }}">
+    <div class="social-row">
+      {% if socials.facebook %}
+      <div class="dot"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#1877F2"/><path d="M13.5 21v-7h2.3l.35-2.7h-2.65V9.6c0-.78.22-1.31 1.34-1.31h1.43V5.88A19 19 0 0 0 14.1 5.7c-2.03 0-3.42 1.24-3.42 3.51v1.96H8.35v2.7h2.33v7h2.82z" fill="#fff"/></svg></div>
+      {% endif %}
+      {% if socials.instagram %}
+      <div class="dot"><svg viewBox="0 0 24 24"><rect x="1" y="1" width="22" height="22" rx="6" fill="#C13584"/><rect x="6.5" y="6.5" width="11" height="11" rx="3.5" fill="none" stroke="#fff" stroke-width="1.6"/><circle cx="12" cy="12" r="3.2" fill="none" stroke="#fff" stroke-width="1.6"/><circle cx="17.2" cy="6.8" r="1.1" fill="#fff"/></svg></div>
+      {% endif %}
+      {% if socials.whatsapp %}
+      <div class="dot"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#25D366"/><path d="M17 15.3c-.2.6-1.2 1.1-1.7 1.2-.5.1-1 .1-3.3-.8-2.8-1.2-4.5-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 1-2.2.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5.2.5.7 1.8.8 1.9.1.2.1.3 0 .5-.1.2-.2.3-.3.5-.2.2-.3.3-.1.6.2.3.9 1.4 1.9 2.3 1.3 1.1 2.4 1.5 2.7 1.6.3.1.5.1.7-.1.2-.2.7-.8.9-1.1.2-.3.4-.2.6-.1.2.1 1.5.7 1.8.8.3.1.5.2.5.3.1.2.1.7-.1 1.3z" fill="#fff"/></svg></div>
+      {% endif %}
+      {% if socials.tiktok %}
+      <div class="dot"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#000"/><path d="M14.5 6.5c.3 1.4 1.2 2.4 2.7 2.6v1.9c-.9 0-1.8-.3-2.6-.8v4.4a3.9 3.9 0 1 1-3.4-3.9v2a1.9 1.9 0 1 0 1.4 1.9V6.5h1.9z" fill="#fff"/></svg></div>
+      {% endif %}
+    </div>
+  </div>
+
+  <footer>{{ branding.powered_by }} &nbsp;•&nbsp; امسح بكاميرا الموبايل مباشرة</footer>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ business.name_ar }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: {{ theme.primary }};
+    --primary-dark: {{ theme.primary_dark }};
+    --secondary: {{ theme.secondary }};
+    --bg: {{ theme.cream }};
+    --card-bg: #ffffff;
+    --text: {{ theme.text_dark }};
+    --text-soft: #6b6259;
+    --border: #eee0d2;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1a1512;
+      --card-bg: #241d18;
+      --text: #f5efe6;
+      --text-soft: #b8ac9d;
+      --border: #3a3029;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1a1512;
+    --card-bg: #241d18;
+    --text: #f5efe6;
+    --text-soft: #b8ac9d;
+    --border: #3a3029;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Cairo', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 32px 16px 48px;
+  }
+  .page { width: 100%; max-width: 420px; }
+  .header { text-align: center; margin-bottom: 24px; }
+  .logo-circle {
+    width: 84px; height: 84px; border-radius: 50%;
+    background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+    margin: 0 auto 14px; display: flex; align-items: center; justify-content: center;
+    font-size: 34px; font-weight: 800; color: #fff;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+  h1 { font-size: 26px; font-weight: 800; margin: 0 0 4px; }
+  .tagline { color: var(--text-soft); font-size: 14px; margin: 0; }
+
+  .pay-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  }
+  .pay-btn {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 16px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff; text-decoration: none; font-weight: 800; font-size: 17px;
+    border-radius: 14px; border: none; cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.15s ease, transform 0.1s ease;
+  }
+  .pay-btn:active { transform: scale(0.98); }
+  .pay-handle {
+    text-align: center; margin-top: 10px; font-size: 13px; color: var(--text-soft);
+    direction: ltr; unicode-bidi: plaintext;
+  }
+  .pay-hint {
+    text-align: center; margin: 8px 0 0; font-size: 12px; color: var(--text-soft);
+  }
+
+  .socials { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 22px; }
+  .social-btn {
+    background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px;
+    padding: 14px 6px; display: flex; flex-direction: column; align-items: center; gap: 6px;
+    text-decoration: none; color: var(--text); font-size: 11px; font-weight: 600;
+  }
+  .social-btn svg { width: 26px; height: 26px; }
+
+  footer { text-align: center; font-size: 11px; color: var(--text-soft); margin-top: 8px; }
+  footer a { color: var(--text-soft); }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      {% if logo_b64 %}
+      <div class="logo-circle" style="padding:0; overflow:hidden;">
+        <img src="data:image/png;base64,{{ logo_b64 }}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
+      </div>
+      {% else %}
+      <div class="logo-circle">{{ business.qr_center_letter }}</div>
+      {% endif %}
+      <h1>{{ business.name_ar }}</h1>
+      <p class="tagline">{{ business.tagline_ar }}</p>
+    </div>
+
+    <div class="pay-card">
+      {% if payment.instapay_link %}
+      <a class="pay-btn" href="{{ payment.instapay_link }}" target="_blank" rel="noopener noreferrer">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 10h18M7 15h4M3 6h18a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1z" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>ادفع عبر InstaPay</span>
+      </a>
+      {% else %}
+      <button class="pay-btn" id="copyHandleBtn" onclick="copyInstaPayHandle()" type="button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        <span id="copyBtnText">نسخ عنوان InstaPay</span>
+      </button>
+      {% endif %}
+      <p class="pay-handle">{{ payment.instapay_handle }}</p>
+      {% if not payment.instapay_link %}
+      <p class="pay-hint">انسخ العنوان وافتحه في تطبيق InstaPay للتحويل</p>
+      {% endif %}
+    </div>
+
+    <div class="socials">
+      {% if socials.facebook %}
+      <a class="social-btn" href="{{ socials.facebook }}">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#1877F2"/><path d="M13.5 21v-7h2.3l.35-2.7h-2.65V9.6c0-.78.22-1.31 1.34-1.31h1.43V5.88A19 19 0 0 0 14.1 5.7c-2.03 0-3.42 1.24-3.42 3.51v1.96H8.35v2.7h2.33v7h2.82z" fill="#fff"/></svg>
+        فيسبوك
+      </a>
+      {% endif %}
+      {% if socials.instagram %}
+      <a class="social-btn" href="{{ socials.instagram }}">
+        <svg viewBox="0 0 24 24"><defs><linearGradient id="ig" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#FFDC80"/><stop offset="0.4" stop-color="#F56040"/><stop offset="0.7" stop-color="#C13584"/><stop offset="1" stop-color="#5851DB"/></linearGradient></defs><rect x="1" y="1" width="22" height="22" rx="6" fill="url(#ig)"/><rect x="6.5" y="6.5" width="11" height="11" rx="3.5" fill="none" stroke="#fff" stroke-width="1.6"/><circle cx="12" cy="12" r="3.2" fill="none" stroke="#fff" stroke-width="1.6"/><circle cx="17.2" cy="6.8" r="1.1" fill="#fff"/></svg>
+        انستجرام
+      </a>
+      {% endif %}
+      {% if socials.whatsapp %}
+      <a class="social-btn" href="{{ socials.whatsapp }}">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#25D366"/><path d="M12 6a6.6 6.6 0 0 0-5.7 9.9L5.5 19l3.2-.8A6.6 6.6 0 1 0 12 6z" fill="none"/><path d="M17 15.3c-.2.6-1.2 1.1-1.7 1.2-.5.1-1 .1-3.3-.8-2.8-1.2-4.5-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 1-2.2.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5.2.5.7 1.8.8 1.9.1.2.1.3 0 .5-.1.2-.2.3-.3.5-.2.2-.3.3-.1.6.2.3.9 1.4 1.9 2.3 1.3 1.1 2.4 1.5 2.7 1.6.3.1.5.1.7-.1.2-.2.7-.8.9-1.1.2-.3.4-.2.6-.1.2.1 1.5.7 1.8.8.3.1.5.2.5.3.1.2.1.7-.1 1.3z" fill="#fff"/></svg>
+        واتساب
+      </a>
+      {% endif %}
+      {% if socials.tiktok %}
+      <a class="social-btn" href="{{ socials.tiktok }}">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#000"/><path d="M14.5 6.5c.3 1.4 1.2 2.4 2.7 2.6v1.9c-.9 0-1.8-.3-2.6-.8v4.4a3.9 3.9 0 1 1-3.4-3.9v2a1.9 1.9 0 1 0 1.4 1.9V6.5h1.9z" fill="#fff"/></svg>
+        تيك توك
+      </a>
+      {% endif %}
+    </div>
+
+    <footer>
+      {{ branding.powered_by }}
+    </footer>
+  </div>
+
+  <script>
+    function copyInstaPayHandle() {
+      const handle = {{ payment.instapay_handle | tojson }};
+      const btnText = document.getElementById("copyBtnText");
+      if (!handle) return;
+
+      function onSuccess() {
+        if (btnText) {
+          const original = btnText.textContent;
+          btnText.textContent = "تم نسخ العنوان! ✓";
+          setTimeout(function() {
+            btnText.textContent = original;
+          }, 2500);
+        }
+      }
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(handle).then(onSuccess).catch(function() {
+          fallbackCopy(handle, onSuccess);
+        });
+      } else {
+        fallbackCopy(handle, onSuccess);
+      }
+    }
+
+    function fallbackCopy(text, cb) {
+      const textarea = document.createElement("textarea");
+      textarea.value = text;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      try {
+        document.execCommand("copy");
+        if (cb) cb();
+      } catch (e) {}
+      document.body.removeChild(textarea);
+    }
+  </script>
+</body>
+</html>

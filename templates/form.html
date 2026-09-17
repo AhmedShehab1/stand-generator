@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ "Edit" if mode == "edit" else "New" }} business — Stand+</title>
+<style>
+  :root { color-scheme: light; }
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    max-width: 560px; margin: 40px auto; padding: 0 20px;
+    color: #222; background: #fafafa;
+  }
+  h1 { font-size: 22px; margin-bottom: 4px; color: #111; }
+  p.sub { color: #666; margin-top: 0; font-size: 14px; }
+  fieldset { border: 1px solid #ddd; border-radius: 10px; padding: 16px 18px; margin-bottom: 16px; }
+  legend { font-weight: 600; padding: 0 6px; font-size: 13px; color: #555; }
+  label { display: block; font-size: 13px; font-weight: 600; margin: 10px 0 4px; color: #333; }
+  label.optional::after { content: " (optional)"; font-weight: 400; color: #999; }
+  input[type=text], input[type=url], input[type=tel], textarea {
+    width: 100%; padding: 9px 10px; border: 1px solid #ccc; border-radius: 7px;
+    font-size: 14px; box-sizing: border-box; background: #fff; color: #111;
+  }
+  input::placeholder, textarea::placeholder { color: #888; opacity: 1; }
+  input[type=file] { color: #333; }
+  input:focus, textarea:focus { outline: none; border-color: #555; }
+  input[dir=rtl] { text-align: right; }
+  .hint { font-size: 12px; color: #888; margin-top: 3px; }
+  .themes { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+  .theme-option { cursor: pointer; text-align: center; font-size: 11px; color: #555; }
+  .theme-option input { display: none; }
+  .swatch {
+    width: 42px; height: 42px; border-radius: 50%; margin: 0 auto 4px;
+    border: 2px solid transparent; box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  }
+  .theme-option input:checked + .swatch { border-color: #333; }
+  button {
+    width: 100%; padding: 12px; margin-top: 8px; border: none; border-radius: 8px;
+    background: #1a1a1a; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer;
+  }
+  button:hover { background: #333; }
+  .current-logo { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; margin-top: 6px; }
+</style>
+</head>
+<body>
+  <h1>{{ "Edit business" if mode == "edit" else "New business" }}</h1>
+  <p class="sub">
+    {% if mode == "edit" %}
+      Update this business's info — the printed stand keeps working, only the linked page changes.
+    {% else %}
+      Fill this in once per client. You'll get a live link and a printable PDF at the end.
+    {% endif %}
+  </p>
+
+  <form method="post" enctype="multipart/form-data"
+        action="{{ url_for('edit', slug=business.slug, token=token) if mode == 'edit' else url_for('submit') }}">
+
+    {% if mode == "edit" %}<input type="hidden" name="token" value="{{ token }}">{% endif %}
+
+    <fieldset>
+      <legend>Business</legend>
+
+      <label>Business name (Arabic)</label>
+      <input type="text" name="name_ar" dir="rtl" required
+             value="{{ business.name_ar if business else '' }}" placeholder="عصير و شمس">
+
+      <label class="optional">Tagline (Arabic)</label>
+      <input type="text" name="tagline_ar" dir="rtl"
+             value="{{ business.tagline_ar if business else '' }}" placeholder="عصائر طازة من غير خلطات">
+
+      {% if mode != "edit" %}
+      <label class="optional">Business name (English)</label>
+      <input type="text" name="name_en" placeholder="Juice and Sun">
+      <p class="hint">Used to build the page URL, e.g. yourdomain.com/l/juice-and-sun. Leave blank to auto-generate.</p>
+      {% endif %}
+    </fieldset>
+
+    <fieldset>
+      <legend>Look</legend>
+      <div class="themes">
+        {% for key, t in themes.items() %}
+        <label class="theme-option">
+          <input type="radio" name="theme_name" value="{{ key }}"
+                 {% if (business.theme_name if business else 'citrus') == key %}checked{% endif %}>
+          <div class="swatch" style="background: linear-gradient(135deg, {{ t.primary }}, {{ t.secondary }});"></div>
+          {{ t.label }}
+        </label>
+        {% endfor %}
+      </div>
+
+      <label class="optional">Logo</label>
+      {% if business and business.logo_b64 %}
+        <img class="current-logo" src="data:image/png;base64,{{ business.logo_b64 }}">
+        <p class="hint">Current logo shown above. Upload a new file to replace it, or leave blank to keep it.</p>
+      {% endif %}
+      <input type="file" name="logo" accept="image/*">
+      <p class="hint">Displayed in the top banner of the printed stand and on your live online page. (The QR code center features your brand monogram).</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Payment</legend>
+
+      <label>InstaPay handle</label>
+      <input type="text" name="instapay_handle" required
+             value="{{ business.instapay_handle if business else '' }}" placeholder="name@instapay">
+
+      <label class="optional">InstaPay payment link</label>
+      <input type="url" name="instapay_link"
+             value="{{ business.instapay_link if business else '' }}" placeholder="https://ipn.eg/S/...">
+      <p class="hint">From the InstaPay app: Share → Copy Link. If you don't have one, the handle above is encoded instead.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Social links (fill in whichever apply)</legend>
+
+      <label class="optional">WhatsApp number</label>
+      <input type="tel" name="whatsapp_number"
+             value="{{ socials.whatsapp.replace('https://wa.me/', '') if socials.whatsapp else '' }}"
+             placeholder="+20 100 000 0000">
+
+      <label class="optional">Facebook URL</label>
+      <input type="url" name="facebook"
+             value="{{ socials.facebook if socials.facebook else '' }}" placeholder="https://facebook.com/yourpage">
+
+      <label class="optional">Instagram URL</label>
+      <input type="url" name="instagram"
+             value="{{ socials.instagram if socials.instagram else '' }}" placeholder="https://instagram.com/yourpage">
+
+      <label class="optional">TikTok URL</label>
+      <input type="url" name="tiktok"
+             value="{{ socials.tiktok if socials.tiktok else '' }}" placeholder="https://tiktok.com/@yourpage">
+    </fieldset>
+
+    <button type="submit">{{ "Save changes" if mode == "edit" else "Create business" }}</button>
+  </form>
+</body>
+</html>

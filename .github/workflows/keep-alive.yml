@@ -1,0 +1,20 @@
+name: Keep Alive Ping
+
+on:
+  schedule:
+    # Run every 10 minutes between 05:00 UTC and 23:59 UTC
+    # In Egypt summer (UTC+3): 8:00 AM – 2:50 AM Cairo time
+    # In Egypt winter (UTC+2): 7:00 AM – 1:50 AM Cairo time
+    # Consumes ~19 hours/day (~589 hours/month), leaving >160 spare hours on Render free tier.
+    - cron: '*/10 5-23 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Health Endpoint
+        run: |
+          URL="${{ secrets.RENDER_HEALTH_URL || 'https://stand-generator.onrender.com/health' }}"
+          echo "Pinging $URL ..."
+          curl -fsS -m 20 "$URL" || echo "Ping failed or server waking up"
